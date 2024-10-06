@@ -1,5 +1,6 @@
 from typing import Union
 from fastapi import FastAPI
+from routers import general_objective_router
 
 app = FastAPI()
 
@@ -7,6 +8,4 @@ app = FastAPI()
 async def read_root():
     return {"End point de prueba": "proyecto de regalias"}
 
-@app.get("/items/{item_id}")
-async def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
+app.include_router(general_objective_router.router, prefix="/api/v1", tags=["General Objectives"])

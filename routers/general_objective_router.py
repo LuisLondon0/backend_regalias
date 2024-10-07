@@ -54,3 +54,14 @@ def delete_general_objective(general_objective_id: int):
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal Server Error")
+    
+
+@router.get("/test/{id}", response_model=str)
+def get_test(id: int):
+    try:
+        objective = "Prueba exitosa {id}".format(id=id)
+        return objective
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal Server Error")

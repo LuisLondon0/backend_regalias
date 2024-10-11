@@ -9,7 +9,10 @@ class GeneralObjectiveRepository:
         try:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute("INSERT INTO ObjetivoGeneral (descripcion) OUTPUT INSERTED.UniqueID VALUES (?)", (general_objective.description,))
+                    cursor.execute(
+                        "INSERT INTO generalobjective (description) VALUES (%s) RETURNING uniqueid", 
+                        (general_objective.description,)
+                    )
                     row = cursor.fetchone()
                     id = row[0] if row else None
                     conn.commit()
@@ -22,10 +25,13 @@ class GeneralObjectiveRepository:
         try:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute("SELECT * FROM ObjetivoGeneral")
+                    cursor.execute("SELECT * FROM generalobjective")
                     general_objectives = cursor.fetchall()
                     if general_objectives:
-                        return [GeneralObjectiveResponse(id=general_objective[0], description=general_objective[1]) for general_objective in general_objectives]
+                        return [
+                            GeneralObjectiveResponse(id=general_objective[0], description=general_objective[1]) 
+                            for general_objective in general_objectives
+                        ]
                     else:
                         return []
         except Exception as e:
@@ -36,7 +42,7 @@ class GeneralObjectiveRepository:
         try:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute("SELECT * FROM ObjetivoGeneral WHERE UniqueID = ?", (general_objective_id,))
+                    cursor.execute("SELECT * FROM generalobjective WHERE uniqueid = %s", (general_objective_id,))
                     general_objective = cursor.fetchone()
                     if general_objective:
                         return GeneralObjectiveResponse(id=general_objective[0], description=general_objective[1])
@@ -49,7 +55,10 @@ class GeneralObjectiveRepository:
         try:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute("UPDATE ObjetivoGeneral SET descripcion = ? WHERE UniqueID = ?", (general_objective.description, general_objective_id))
+                    cursor.execute(
+                        "UPDATE generalobjective SET description = %s WHERE uniqueid = %s", 
+                        (general_objective.description, general_objective_id)
+                    )
                     conn.commit()
                     return GeneralObjectiveResponse(id=general_objective_id, description=general_objective.description)
         except Exception as e:
@@ -60,7 +69,7 @@ class GeneralObjectiveRepository:
         try:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute("DELETE FROM ObjetivoGeneral WHERE UniqueID = ?", (general_objective_id,))
+                    cursor.execute("DELETE FROM generalobjective WHERE uniqueid = %s", (general_objective_id,))
                     conn.commit()
                     if cursor.rowcount == 0:
                         logging.warning(f"No general objective found with id {general_objective_id}")

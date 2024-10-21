@@ -1,6 +1,6 @@
 from typing import Union
 from fastapi import FastAPI
-from routers import general_objective_router
+from routers import general_objective_router, specific_objective_router
 
 app = FastAPI()
 
@@ -9,3 +9,4 @@ async def read_root():
     return {"End point de prueba": "proyecto de regalias"}
 
 app.include_router(general_objective_router.router, prefix="/api/v1", tags=["General Objectives"])
+app.include_router(specific_objective_router.router, prefix="/api/v1", tags=["Specific Objectives"])

@@ -10,7 +10,7 @@ class GeneralObjectiveRepository:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute(
-                        "INSERT INTO generalobjective (description) VALUES (%s) RETURNING uniqueid", 
+                        "INSERT INTO generalobjectives (description) VALUES (%s) RETURNING uniqueid", 
                         (general_objective.description,)
                     )
                     row = cursor.fetchone()
@@ -25,7 +25,7 @@ class GeneralObjectiveRepository:
         try:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute("SELECT * FROM generalobjective")
+                    cursor.execute("SELECT * FROM generalobjectives")
                     general_objectives = cursor.fetchall()
                     if general_objectives:
                         return [
@@ -42,7 +42,7 @@ class GeneralObjectiveRepository:
         try:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute("SELECT * FROM generalobjective WHERE uniqueid = %s", (general_objective_id,))
+                    cursor.execute("SELECT * FROM generalobjectives WHERE uniqueid = %s", (general_objective_id,))
                     general_objective = cursor.fetchone()
                     if general_objective:
                         return GeneralObjectiveResponse(id=general_objective[0], description=general_objective[1])
@@ -69,7 +69,7 @@ class GeneralObjectiveRepository:
         try:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute("DELETE FROM generalobjective WHERE uniqueid = %s", (general_objective_id,))
+                    cursor.execute("DELETE FROM generalobjectives WHERE uniqueid = %s", (general_objective_id,))
                     conn.commit()
                     if cursor.rowcount == 0:
                         logging.warning(f"No general objective found with id {general_objective_id}")

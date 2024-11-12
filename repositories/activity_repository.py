@@ -10,7 +10,7 @@ class ActivityRepository:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute(
-                        "INSERT INTO activities (specificobjectiveid, description, product, verificationmethod, productindicator) VALUES (%s, %s, %s, %s, %s) RETURNING uniqueid", 
+                        "INSERT INTO activities (specificobjectiveid, description, product, verificationmethod, indicatorofproduct) VALUES (%s, %s, %s, %s, %s) RETURNING activityid", 
                         (activity.specific_objective_id, activity.description, activity.product, activity.verification_method, activity.product_indicator)
                     )
                     row = cursor.fetchone()
@@ -42,7 +42,7 @@ class ActivityRepository:
         try:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute("SELECT * FROM activities WHERE uniqueid = %s", (activity_id,))
+                    cursor.execute("SELECT * FROM activities WHERE activityid = %s", (activity_id,))
                     activity = cursor.fetchone()
                     if activity:
                         return ActivityResponse(id=activity[0], specific_objective_id=activity[1], description=activity[2], product=activity[3], verification_method=activity[4], product_indicator=activity[5])
@@ -56,7 +56,7 @@ class ActivityRepository:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute(
-                        "UPDATE activities SET specificobjectiveid = %s, description = %s, product = %s, verificationmethod = %s, productindicator = %s WHERE uniqueid = %s", 
+                        "UPDATE activities SET specificobjectiveid = %s, description = %s, product = %s, verificationmethod = %s, indicatorofproduct = %s WHERE activityid = %s", 
                         (activity.specific_objective_id, activity.description, activity.product, activity.verification_method, activity.product_indicator, activity_id)
                     )
                     conn.commit()
@@ -69,7 +69,7 @@ class ActivityRepository:
         try:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute("DELETE FROM activities WHERE uniqueid = %s", (activity_id,))
+                    cursor.execute("DELETE FROM activities WHERE activityid = %s", (activity_id,))
                     conn.commit()
                     if cursor.rowcount == 0:
                         logging.warning(f"No activity found with id {activity_id}")

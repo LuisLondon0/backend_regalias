@@ -10,7 +10,7 @@ class SpecificObjectiveRepository:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute(
-                        "INSERT INTO specificobjectives (generalobjectiveid, description) VALUES (%s, %s) RETURNING uniqueid", 
+                        "INSERT INTO specificobjectives (generalobjectiveid, description) VALUES (%s, %s) RETURNING specificobjectiveid", 
                         (specific_objective.general_objective_id, specific_objective.description)
                     )
                     row = cursor.fetchone()
@@ -42,7 +42,7 @@ class SpecificObjectiveRepository:
         try:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute("SELECT * FROM specificobjectives WHERE uniqueid = %s", (specific_objective_id,))
+                    cursor.execute("SELECT * FROM specificobjectives WHERE specificobjectiveid = %s", (specific_objective_id,))
                     specific_objective = cursor.fetchone()
                     if specific_objective:
                         return SpecificObjectiveResponse(id=specific_objective[0], general_objective_id=specific_objective[1], description=specific_objective[2])
@@ -56,7 +56,7 @@ class SpecificObjectiveRepository:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute(
-                        "UPDATE specificobjectives SET general_objective_id = %s, description = %s WHERE uniqueid = %s", 
+                        "UPDATE specificobjectives SET generalobjectiveid = %s, description = %s WHERE specificobjectiveid = %s", 
                         (specific_objective.general_objective_id, specific_objective.description, specific_objective_id)
                     )
                     conn.commit()
@@ -69,7 +69,7 @@ class SpecificObjectiveRepository:
         try:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute("DELETE FROM specificobjectives WHERE uniqueid = %s", (specific_objective_id,))
+                    cursor.execute("DELETE FROM specificobjectives WHERE specificobjectiveid = %s", (specific_objective_id,))
                     conn.commit()
                     if cursor.rowcount == 0:
                         logging.warning(f"No specific objective found with id {specific_objective_id}")

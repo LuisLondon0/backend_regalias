@@ -1,12 +1,18 @@
 from repositories.general_objective_repository import GeneralObjectiveRepository
 from schemas.general_objective_schema import GeneralObjectiveCreate, GeneralObjectiveResponse
+from services.project_service import ProjectService
 import logging
 
 class GeneralObjectiveService:
     def __init__(self):
         self.repo = GeneralObjectiveRepository()
+        self.project_service = ProjectService()
 
     def create_general_objective(self, general_objective: GeneralObjectiveCreate) -> GeneralObjectiveResponse:
+        project = self.project_service.get_project_by_id(general_objective.project_id)
+        if not project:
+            raise ValueError("Project does not exist")
+        
         if not general_objective.description:
             raise ValueError("Description cannot be empty")
 
@@ -20,7 +26,6 @@ class GeneralObjectiveService:
 
     def get_general_objectives(self):
         objectives = self.repo.get_general_objectives()
-
         return objectives
 
     def get_general_objective_by_id(self, general_objective_id: int):
@@ -30,6 +35,10 @@ class GeneralObjectiveService:
         return self.repo.get_general_objective_by_id(general_objective_id)
 
     def update_general_objective(self, general_objective_id: int, general_objective: GeneralObjectiveCreate) -> GeneralObjectiveResponse:
+        project = self.project_service.get_project_by_id(general_objective.project_id)
+        if not project:
+            raise ValueError("Project does not exist")
+        
         if not general_objective.description:
             raise ValueError("Description cannot be empty")
 

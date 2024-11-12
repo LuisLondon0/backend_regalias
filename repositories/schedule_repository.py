@@ -10,7 +10,7 @@ class ScheduleRepository:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute(
-                        "INSERT INTO schedulebytask (taskid, scheduleid) VALUES (%s, %s) RETURNING uniqueid",
+                        "INSERT INTO taskschedule (taskid, weekid) VALUES (%s, %s) RETURNING scheduleid",
                         (schedule.task_id, schedule.week_id)
                     )
                     row = cursor.fetchone()
@@ -25,7 +25,7 @@ class ScheduleRepository:
         try:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute("SELECT * FROM schedulebytask")
+                    cursor.execute("SELECT * FROM taskschedule")
                     schedules = cursor.fetchall()
                     return [
                         ScheduleTaskResponse(id=schedule[0], task_id=schedule[1], week_id=schedule[2]) 
@@ -39,7 +39,7 @@ class ScheduleRepository:
         try:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute("SELECT * FROM schedulebytask WHERE uniqueid = %s", (schedule_id,))
+                    cursor.execute("SELECT * FROM taskschedule WHERE scheduleid = %s", (schedule_id,))
                     schedule = cursor.fetchone()
                     if schedule:
                         return ScheduleTaskResponse(id=schedule[0], task_id=schedule[1], week_id=schedule[2])
@@ -53,7 +53,7 @@ class ScheduleRepository:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute(
-                        "UPDATE schedulebytask SET taskid = %s, scheduleid = %s WHERE uniqueid = %s",
+                        "UPDATE taskschedule SET taskid = %s, weekid = %s WHERE scheduleid = %s",
                         (schedule.task_id, schedule.week_id, schedule_id)
                     )
                     conn.commit()
@@ -66,7 +66,7 @@ class ScheduleRepository:
         try:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute("DELETE FROM schedulebytask WHERE uniqueid = %s", (schedule_id,))
+                    cursor.execute("DELETE FROM taskschedule WHERE scheduleid = %s", (schedule_id,))
                     conn.commit()
                     if cursor.rowcount == 0:
                         logging.warning(f"No schedule found with id {schedule_id}")

@@ -10,7 +10,7 @@ class TaskRepository:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute(
-                        "INSERT INTO tasks (activityid, description, responsible, requiredpersonnel, activityresults, technicalrequirement) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id", 
+                        "INSERT INTO tasks (activityid, description, responsible, requiredpersonnel, activityresults, technicalrequirements) VALUES (%s, %s, %s, %s, %s, %s) RETURNING taskid", 
                         (task.activity_id, task.description, task.responsible, task.required_personnel, task.activity_results, task.technical_requirement)
                     )
                     row = cursor.fetchone()
@@ -42,7 +42,7 @@ class TaskRepository:
         try:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute("SELECT * FROM tasks WHERE uniqueid = %s", (task_id,))
+                    cursor.execute("SELECT * FROM tasks WHERE taskid = %s", (task_id,))
                     task = cursor.fetchone()
                     if task:
                         return TaskResponse(id=task[0], activity_id=task[1], description=task[2], responsible=task[3], required_personnel=task[4], activity_results=task[5], technical_requirement=task[6])
@@ -56,7 +56,7 @@ class TaskRepository:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute(
-                        "UPDATE tasks SET activityid = %s, description = %s, responsible = %s, requiredpersonnel = %s, activityresults = %s, technicalrequirement = %s WHERE uniqueid = %s", 
+                        "UPDATE tasks SET activityid = %s, description = %s, responsible = %s, requiredpersonnel = %s, activityresults = %s, technicalrequirements = %s WHERE taskid = %s", 
                         (task.activity_id, task.description, task.responsible, task.required_personnel, task.activity_results, task.technical_requirement, task_id)
                     )
                     conn.commit()
@@ -69,7 +69,7 @@ class TaskRepository:
         try:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute("DELETE FROM tasks WHERE uniqueid = %s", (task_id,))
+                    cursor.execute("DELETE FROM tasks WHERE taskid = %s", (task_id,))
                     conn.commit()
                     if cursor.rowcount == 0:
                         logging.warning(f"No task found with id {task_id}")

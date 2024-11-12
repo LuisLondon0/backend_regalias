@@ -10,13 +10,13 @@ class GeneralObjectiveRepository:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute(
-                        "INSERT INTO generalobjectives (description) VALUES (%s) RETURNING uniqueid", 
-                        (general_objective.description,)
+                        "INSERT INTO generalobjective (projectid, description) VALUES (%s, %s) RETURNING generalobjectiveid", 
+                        (general_objective.project_id, general_objective.description)
                     )
                     row = cursor.fetchone()
                     id = row[0] if row else None
                     conn.commit()
-                    return GeneralObjectiveResponse(id=id, description=general_objective.description)
+                    return GeneralObjectiveResponse(id=id, project_id=general_objective.project_id, description=general_objective.description)
         except Exception as e:
             logging.error(f"Error creating general objective: {e}")
             raise
@@ -25,11 +25,11 @@ class GeneralObjectiveRepository:
         try:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute("SELECT * FROM generalobjectives")
+                    cursor.execute("SELECT * FROM generalobjective")
                     general_objectives = cursor.fetchall()
                     if general_objectives:
                         return [
-                            GeneralObjectiveResponse(id=general_objective[0], description=general_objective[1]) 
+                            GeneralObjectiveResponse(id=general_objective[0], project_id=general_objective[1], description=general_objective[2]) 
                             for general_objective in general_objectives
                         ]
                     else:
@@ -42,10 +42,10 @@ class GeneralObjectiveRepository:
         try:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute("SELECT * FROM generalobjectives WHERE uniqueid = %s", (general_objective_id,))
+                    cursor.execute("SELECT * FROM generalobjective WHERE generalobjectiveid = %s", (general_objective_id,))
                     general_objective = cursor.fetchone()
                     if general_objective:
-                        return GeneralObjectiveResponse(id=general_objective[0], description=general_objective[1])
+                        return GeneralObjectiveResponse(id=general_objective[0], project_id=general_objective[1], description=general_objective[2])
                     return None
         except Exception as e:
             logging.error(f"Error fetching general objective by id {general_objective_id}: {e}")
@@ -56,11 +56,11 @@ class GeneralObjectiveRepository:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute(
-                        "UPDATE generalobjective SET description = %s WHERE uniqueid = %s", 
-                        (general_objective.description, general_objective_id)
+                        "UPDATE generalobjective SET projectid = %s, description = %s WHERE generalobjectiveid = %s", 
+                        (general_objective.project_id, general_objective.description, general_objective_id)
                     )
                     conn.commit()
-                    return GeneralObjectiveResponse(id=general_objective_id, description=general_objective.description)
+                    return GeneralObjectiveResponse(id=general_objective_id, project_id=general_objective.project_id, description=general_objective.description)
         except Exception as e:
             logging.error(f"Error updating general objective: {e}")
             raise
@@ -69,7 +69,7 @@ class GeneralObjectiveRepository:
         try:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute("DELETE FROM generalobjectives WHERE uniqueid = %s", (general_objective_id,))
+                    cursor.execute("DELETE FROM generalobjective WHERE generalobjectiveid = %s", (general_objective_id,))
                     conn.commit()
                     if cursor.rowcount == 0:
                         logging.warning(f"No general objective found with id {general_objective_id}")

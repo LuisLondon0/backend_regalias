@@ -10,7 +10,7 @@ class WeekRepository:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute(
-                        "INSERT INTO weeks (week) VALUES (%s) RETURNING uniqueid", 
+                        "INSERT INTO weeks (week) VALUES (%s) RETURNING weekid", 
                         (week.week,)
                     )
                     row = cursor.fetchone()
@@ -42,7 +42,7 @@ class WeekRepository:
         try:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute("SELECT * FROM weeks WHERE uniqueid = %s", (week_id,))
+                    cursor.execute("SELECT * FROM weeks WHERE weekid = %s", (week_id,))
                     week = cursor.fetchone()
                     if week:
                         return WeekResponse(id=week[0], week=week[1])
@@ -69,7 +69,7 @@ class WeekRepository:
         try:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute("DELETE FROM weeks WHERE uniqueid = %s", (week_id,))
+                    cursor.execute("DELETE FROM weeks WHERE weekid = %s", (week_id,))
                     conn.commit()
                     if cursor.rowcount == 0:
                         logging.warning(f"No week found with id {week_id}")

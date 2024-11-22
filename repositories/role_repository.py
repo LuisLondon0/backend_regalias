@@ -51,6 +51,19 @@ class RoleRepository:
             logging.error(f"Error fetching role by id {role_id}: {e}")
             raise
 
+    def get_role_by_description(self, description: str):
+        try:
+            with DatabaseConnection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("SELECT * FROM roles WHERE description = %s", (description,))
+                    role = cursor.fetchone()
+                    if role:
+                        return RoleResponse(id=role[0], description=role[1])
+                    return None
+        except Exception as e:
+            logging.error(f"Error fetching role by description {description}: {e}")
+            raise
+
     def update_role(self, role_id: int, role: RoleCreate) -> RoleResponse:
         try:
             with DatabaseConnection() as conn:

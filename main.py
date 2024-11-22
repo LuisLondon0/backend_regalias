@@ -1,6 +1,8 @@
 from typing import Union
-from fastapi import FastAPI
-from routers import general_objective_router, specific_objective_router, activity_router, task_router, week_router, schedule_router, project_router, role_router
+from fastapi import FastAPI, HTTPException
+from routers import general_objective_router, specific_objective_router, activity_router, task_router, week_router, schedule_router, project_router, role_router, user_router
+from fastapi.responses import JSONResponse
+import logging
 
 app = FastAPI()
 
@@ -8,7 +10,22 @@ app = FastAPI()
 async def read_root():
     return {"End point de prueba": "proyecto de regalias"}
 
+@app.middleware("http")
+async def custom_exception_handler(request, call_next):
+    try:
+        response = await call_next(request)
+        return response
+    except ValueError as e:
+        return JSONResponse(status_code=400, content={"detail": str(e)})
+    except HTTPException as e:
+        return JSONResponse(status_code=e.status_code, content={"detail": e.detail})
+    except Exception as e:
+        logging.error(f"Unhandled exception: {e}")
+        return JSONResponse(status_code=500, content={"detail": "Internal Server Error"})
+
+
 app.include_router(role_router.router, prefix="/api/v1", tags=["Roles"])
+app.include_router(user_router.router, prefix="/api/v1", tags=["Users"])
 app.include_router(project_router.router, prefix="/api/v1", tags=["Projects"])
 app.include_router(general_objective_router.router, prefix="/api/v1", tags=["General Objectives"])
 app.include_router(specific_objective_router.router, prefix="/api/v1", tags=["Specific Objectives"])

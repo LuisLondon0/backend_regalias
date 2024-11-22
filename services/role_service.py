@@ -1,6 +1,7 @@
 from repositories.role_repository import RoleRepository
 from schemas.role_schema import RoleCreate, RoleResponse
 import logging
+from fastapi import HTTPException
 
 class RoleService:
     def __init__(self):
@@ -10,7 +11,10 @@ class RoleService:
         if not role.description:
             raise ValueError("Description cannot be empty")
 
-        role.description = role.description.strip()
+        role.description = role.description.strip().upper()
+        existing_role = self.repo.get_role_by_description(role.description)
+        if existing_role:
+            raise HTTPException(status_code=409, detail="Role already exists")
 
         response = self.repo.create_role(role)
 
@@ -33,7 +37,7 @@ class RoleService:
         if not role.description:
             raise ValueError("Description cannot be empty")
 
-        role.description = role.description.strip()
+        role.description = role.description.strip().upper()
 
         response = self.repo.update_role(role_id, role)
 

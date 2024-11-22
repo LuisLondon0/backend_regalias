@@ -1,17 +1,17 @@
 from repositories.specific_objective_repository import SpecificObjectiveRepository
 from schemas.specific_objective_schema import SpecificObjectiveCreate, SpecificObjectiveResponse
-from services.general_objective_service import GeneralObjectiveService
+from services.project_service import ProjectService
 import logging
 
 class SpecificObjectiveService:
     def __init__(self):
         self.repo = SpecificObjectiveRepository()
-        self.general_objective_service = GeneralObjectiveService()
+        self.project_service = ProjectService()
 
     def create_specific_objective(self, specific_objective: SpecificObjectiveCreate) -> SpecificObjectiveResponse:
-        general_objective = self.general_objective_service.get_general_objective_by_id(specific_objective.general_objective_id)
-        if not general_objective:
-            raise ValueError("General objective does not exist")
+        project = self.project_service.get_project_by_id(specific_objective.project_id)
+        if not project:
+            raise ValueError("Project does not exist")
 
         if not specific_objective.description:
             raise ValueError("Description cannot be empty")
@@ -35,9 +35,9 @@ class SpecificObjectiveService:
         return self.repo.get_specific_objective_by_id(specific_objective_id)
 
     def update_specific_objective(self, specific_objective_id: int, specific_objective: SpecificObjectiveCreate) -> SpecificObjectiveResponse:
-        general_objective = self.general_objective_service.get_general_objective_by_id(specific_objective.general_objective_id)
-        if not general_objective:
-            raise ValueError("General objective does not exist")
+        project = self.project_service.get_project_by_id(specific_objective.project_id)
+        if not project:
+            raise ValueError("Project does not exist")
 
         if not specific_objective.description:
             raise ValueError("Description cannot be empty")

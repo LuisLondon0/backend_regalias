@@ -1,8 +1,19 @@
 from typing import Union
 from fastapi import FastAPI, HTTPException
-from routers import general_objective_router, specific_objective_router, activity_router, task_router, week_router, schedule_router, project_router, role_router, user_router, users_projects_router
 from fastapi.responses import JSONResponse
 import logging
+
+from routers import (
+    specific_objective_router,
+    activity_router,
+    task_router,
+    week_router,
+    schedule_router,
+    project_router,
+    role_router,
+    user_router,
+    users_projects_router
+)
 
 app = FastAPI()
 
@@ -28,7 +39,6 @@ app.include_router(role_router.router, prefix="/api/v1", tags=["Roles"])
 app.include_router(user_router.router, prefix="/api/v1", tags=["Users"])
 app.include_router(project_router.router, prefix="/api/v1", tags=["Projects"])
 app.include_router(users_projects_router.router, prefix="/api/v1", tags=["Users Projects"])
-app.include_router(general_objective_router.router, prefix="/api/v1", tags=["General Objectives"])
 app.include_router(specific_objective_router.router, prefix="/api/v1", tags=["Specific Objectives"])
 app.include_router(activity_router.router, prefix="/api/v1", tags=["Activities"])
 app.include_router(task_router.router, prefix="/api/v1", tags=["Tasks"])

@@ -10,13 +10,13 @@ class SpecificObjectiveRepository:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute(
-                        "INSERT INTO specificobjectives (generalobjectiveid, description) VALUES (%s, %s) RETURNING specificobjectiveid", 
-                        (specific_objective.general_objective_id, specific_objective.description)
+                        "INSERT INTO specificobjectives (description, projectid) VALUES (%s, %s) RETURNING specificobjectiveid", 
+                        (specific_objective.description, specific_objective.project_id)
                     )
                     row = cursor.fetchone()
                     id = row[0] if row else None
                     conn.commit()
-                    return SpecificObjectiveResponse(id=id, general_objective_id=specific_objective.general_objective_id, description=specific_objective.description)
+                    return SpecificObjectiveResponse(id=id, description=specific_objective.description, project_id=specific_objective.project_id)
         except Exception as e:
             logging.error(f"Error creating specific objective: {e}")
             raise
@@ -29,7 +29,7 @@ class SpecificObjectiveRepository:
                     specific_objectives = cursor.fetchall()
                     if specific_objectives:
                         return [
-                            SpecificObjectiveResponse(id=specific_objective[0], general_objective_id=specific_objective[1], description=specific_objective[2]) 
+                            SpecificObjectiveResponse(id=specific_objective[0], description=specific_objective[1], project_id=specific_objective[2]) 
                             for specific_objective in specific_objectives
                         ]
                     else:
@@ -45,7 +45,7 @@ class SpecificObjectiveRepository:
                     cursor.execute("SELECT * FROM specificobjectives WHERE specificobjectiveid = %s", (specific_objective_id,))
                     specific_objective = cursor.fetchone()
                     if specific_objective:
-                        return SpecificObjectiveResponse(id=specific_objective[0], general_objective_id=specific_objective[1], description=specific_objective[2])
+                        return SpecificObjectiveResponse(id=specific_objective[0], description=specific_objective[1], project_id=specific_objective[2])
                     return None
         except Exception as e:
             logging.error(f"Error fetching specific objective by id {specific_objective_id}: {e}")
@@ -56,11 +56,11 @@ class SpecificObjectiveRepository:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute(
-                        "UPDATE specificobjectives SET generalobjectiveid = %s, description = %s WHERE specificobjectiveid = %s", 
-                        (specific_objective.general_objective_id, specific_objective.description, specific_objective_id)
+                        "UPDATE specificobjectives SET description = %s, projectid = %s WHERE specificobjectiveid = %s", 
+                        (specific_objective.description, specific_objective.project_id, specific_objective_id)
                     )
                     conn.commit()
-                    return SpecificObjectiveResponse(id=specific_objective_id, general_objective_id=specific_objective.general_objective_id, description=specific_objective.description)
+                    return SpecificObjectiveResponse(id=specific_objective_id, description=specific_objective.description, project_id=specific_objective.project_id)
         except Exception as e:
             logging.error(f"Error updating specific objective: {e}")
             raise

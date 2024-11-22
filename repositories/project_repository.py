@@ -10,13 +10,23 @@ class ProjectRepository:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute(
-                        "INSERT INTO projects (description) VALUES (%s) RETURNING projectid", 
-                        (project.description,)
+                        """
+                        INSERT INTO projects (description, generalobjective, projectdocument, totalsgr, totalduration) 
+                        VALUES (%s, %s, %s, %s, %s) RETURNING projectid
+                        """, 
+                        (project.description, project.generalobjective, project.projectdocument, project.totalsgr, project.totalduration)
                     )
                     row = cursor.fetchone()
                     id = row[0] if row else None
                     conn.commit()
-                    return ProjectResponse(id=id, description=project.description)
+                    return ProjectResponse(
+                        id=id, 
+                        description=project.description,
+                        generalobjective=project.generalobjective,
+                        projectdocument=project.projectdocument,
+                        totalsgr=project.totalsgr,
+                        totalduration=project.totalduration
+                    )
         except Exception as e:
             logging.error(f"Error creating project: {e}")
             raise
@@ -29,7 +39,14 @@ class ProjectRepository:
                     projects = cursor.fetchall()
                     if projects:
                         return [
-                            ProjectResponse(id=project[0], description=project[1]) 
+                            ProjectResponse(
+                                id=project[0], 
+                                description=project[1],
+                                generalobjective=project[2],
+                                projectdocument=project[3],
+                                totalsgr=project[4],
+                                totalduration=project[5]
+                            ) 
                             for project in projects
                         ]
                     else:
@@ -45,7 +62,14 @@ class ProjectRepository:
                     cursor.execute("SELECT * FROM projects WHERE projectid = %s", (project_id,))
                     project = cursor.fetchone()
                     if project:
-                        return ProjectResponse(id=project[0], description=project[1])
+                        return ProjectResponse(
+                            id=project[0], 
+                            description=project[1],
+                            generalobjective=project[2],
+                            projectdocument=project[3],
+                            totalsgr=project[4],
+                            totalduration=project[5]
+                        )
                     return None
         except Exception as e:
             logging.error(f"Error fetching project by id {project_id}: {e}")
@@ -56,11 +80,22 @@ class ProjectRepository:
             with DatabaseConnection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute(
-                        "UPDATE projects SET description = %s WHERE projectid = %s", 
-                        (project.description, project_id)
+                        """
+                        UPDATE projects 
+                        SET description = %s, generalobjective = %s, projectdocument = %s, totalsgr = %s, totalduration = %s 
+                        WHERE projectid = %s
+                        """, 
+                        (project.description, project.generalobjective, project.projectdocument, project.totalsgr, project.totalduration, project_id)
                     )
                     conn.commit()
-                    return ProjectResponse(id=project_id, description=project.description)
+                    return ProjectResponse(
+                        id=project_id, 
+                        description=project.description,
+                        generalobjective=project.generalobjective,
+                        projectdocument=project.projectdocument,
+                        totalsgr=project.totalsgr,
+                        totalduration=project.totalduration
+                    )
         except Exception as e:
             logging.error(f"Error updating project: {e}")
             raise

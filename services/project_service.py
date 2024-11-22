@@ -20,10 +20,9 @@ class ProjectService:
 
     def get_projects(self):
         projects = self.repo.get_projects()
-
         return projects
 
-    def get_project_by_id(self, project_id: int):
+    def get_project_by_id(self, project_id: int) -> ProjectResponse:
         if project_id <= 0:
             raise ValueError("ID must be a positive integer")
 

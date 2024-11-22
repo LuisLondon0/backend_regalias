@@ -2,11 +2,9 @@ from fastapi import APIRouter, HTTPException, Depends
 from typing import List
 from services.users_projects_service import UsersProjectsService
 from schemas.users_projects_schema import UserProjectCreate, UserProjectResponse
-from fastapi.security import OAuth2PasswordBearer
 
 router = APIRouter()
 service = UsersProjectsService()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 @router.post("/users-projects", response_model=UserProjectResponse)
 def create_user_project(user_project: UserProjectCreate):

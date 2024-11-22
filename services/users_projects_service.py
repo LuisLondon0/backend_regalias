@@ -19,8 +19,10 @@ class UsersProjectsService:
         if not project:
             raise ValueError("Project does not exist")
 
-        response = self.repo.create_user_project(user_project)
+        if self.repo.check_user_project_exists(user_project.user_id, user_project.project_id):
+            raise ValueError("This user is already associated with the specified project")
 
+        response = self.repo.create_user_project(user_project)
         logging.info(f"User-Project relationship created with ID: {response.id}")
 
         return response
@@ -54,8 +56,10 @@ class UsersProjectsService:
         if not project:
             raise ValueError("Project does not exist")
 
-        response = self.repo.update_user_project(id, user_project)
+        if self.repo.check_user_project_exists(user_project.user_id, user_project.project_id):
+            raise ValueError("This user is already associated with the specified project")
 
+        response = self.repo.update_user_project(id, user_project)
         logging.info(f"User-Project relationship with ID: {id} updated")
 
         return response

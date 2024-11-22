@@ -112,3 +112,16 @@ class UsersProjectsRepository:
         except Exception as e:
             logging.error(f"Error deleting user-project relationship: {e}")
             raise
+
+    def check_user_project_exists(self, user_id: int, project_id: int) -> bool:
+        try:
+            with DatabaseConnection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(
+                        "SELECT * FROM userprojects WHERE userid = %s AND projectid = %s",
+                        (user_id, project_id)
+                    )
+                    return cursor.fetchone() is not None
+        except Exception as e:
+            logging.error(f"Error checking if user-project relationship exists: {e}")
+            raise

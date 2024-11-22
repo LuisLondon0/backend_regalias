@@ -1,56 +1,47 @@
 from fastapi import APIRouter, HTTPException
 from typing import List
 from services.schedule_service import ScheduleService
-from schemas.schedule_schema import ScheduleCreate, ScheduleTaskResponse
+from schemas.schedule_schema import ScheduleCreate, ScheduleResponse
 
 router = APIRouter()
 service = ScheduleService()
 
-@router.post("/schedules", response_model=ScheduleTaskResponse)
+@router.post("/schedules", response_model=ScheduleResponse)
 def create_schedule(schedule: ScheduleCreate):
-    try:
-        return service.create_schedule(schedule)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+    return service.create_schedule(schedule)
 
-@router.get("/schedules", response_model=List[ScheduleTaskResponse])
+@router.get("/schedules", response_model=List[ScheduleResponse])
 def get_schedules():
-    try:
-        return service.get_schedules()
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+    return service.get_schedules()
 
-@router.get("/schedules/{schedule_id}", response_model=ScheduleTaskResponse)
-def get_schedule_by_id(schedule_id: int):
-    try:
-        schedule = service.get_schedule_by_id(schedule_id)
-        if schedule is None:
-            raise HTTPException(status_code=404, detail="Schedule not found")
-        return schedule
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+@router.get("/schedules/{id}", response_model=ScheduleResponse)
+def get_schedule_by_id(id: int):
+    schedule = service.get_schedule_by_id(id)
+    if schedule is None:
+        raise HTTPException(status_code=404, detail="Schedule not found")
+    return schedule
 
-@router.put("/schedules/{schedule_id}", response_model=ScheduleTaskResponse)
-def update_schedule(schedule_id: int, schedule: ScheduleCreate):
-    try:
-        return service.update_schedule(schedule_id, schedule)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+@router.get("/schedules/month/{month_id}", response_model=List[ScheduleResponse])
+def get_schedules_by_month_id(month_id: int):
+    schedules = service.get_schedules_by_month_id(month_id)
+    if not schedules:
+        raise HTTPException(status_code=404, detail="Schedules not found for month_id")
+    return schedules
 
-@router.delete("/schedules/{schedule_id}", response_model=bool)
-def delete_schedule(schedule_id: int):
-    try:
-        success = service.delete_schedule(schedule_id)
-        if not success:
-            raise HTTPException(status_code=404, detail="Schedule not found")
-        return success
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+@router.get("/schedules/task/{task_id}", response_model=List[ScheduleResponse])
+def get_schedules_by_task_id(task_id: int):
+    schedules = service.get_schedules_by_task_id(task_id)
+    if not schedules:
+        raise HTTPException(status_code=404, detail="Schedules not found for task_id")
+    return schedules
+
+@router.put("/schedules/{id}", response_model=ScheduleResponse)
+def update_schedule(id: int, schedule: ScheduleCreate):
+    return service.update_schedule(id, schedule)
+
+@router.delete("/schedules/{id}", response_model=bool)
+def delete_schedule(id: int):
+    success = service.delete_schedule(id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Schedule not found")
+    return success

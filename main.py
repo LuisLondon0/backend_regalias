@@ -4,10 +4,10 @@ from fastapi.responses import JSONResponse
 import logging
 
 from routers import (
+    month_router,
     specific_objective_router,
     activity_router,
     task_router,
-    week_router,
     schedule_router,
     project_router,
     role_router,
@@ -42,5 +42,5 @@ app.include_router(users_projects_router.router, prefix="/api/v1", tags=["Users 
 app.include_router(specific_objective_router.router, prefix="/api/v1", tags=["Specific Objectives"])
 app.include_router(activity_router.router, prefix="/api/v1", tags=["Activities"])
 app.include_router(task_router.router, prefix="/api/v1", tags=["Tasks"])
-app.include_router(week_router.router, prefix="/api/v1", tags=["Weeks"])
+app.include_router(month_router.router, prefix="/api/v1", tags=["Months"])
 app.include_router(schedule_router.router, prefix="/api/v1", tags=["Schedules"])

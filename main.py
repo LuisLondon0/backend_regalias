@@ -1,6 +1,7 @@
 from typing import Union
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 import logging
 
 from routers import (
@@ -17,9 +18,13 @@ from routers import (
 
 app = FastAPI()
 
-@app.get("/")
-async def read_root():
-    return {"End point de prueba": "proyecto de regalias"}
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
+)
 
 @app.middleware("http")
 async def custom_exception_handler(request, call_next):
@@ -33,6 +38,11 @@ async def custom_exception_handler(request, call_next):
     except Exception as e:
         logging.error(f"Unhandled exception: {e}")
         return JSONResponse(status_code=500, content={"detail": "Internal Server Error"})
+    
+
+@app.get("/")
+async def read_root():
+    return {"End point de prueba": "proyecto de regalias"}
 
 
 app.include_router(role_router.router, prefix="/api/v1", tags=["Roles"])

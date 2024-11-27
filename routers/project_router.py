@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, UploadFile, File
 from typing import List
 from services.project_service import ProjectService
 from schemas.project_schema import ProjectCreate, ProjectResponse
@@ -9,6 +9,10 @@ service = ProjectService()
 @router.post("/projects", response_model=ProjectResponse)
 def create_project(project: ProjectCreate):
     return service.create_project(project)
+
+@router.post("/projects/from-excel", response_model=List[ProjectResponse])
+async def create_projects_from_excel(file: UploadFile = File(...)):
+    return await service.create_projects_from_excel(file)
 
 @router.get("/projects", response_model=List[ProjectResponse])
 def get_projects():

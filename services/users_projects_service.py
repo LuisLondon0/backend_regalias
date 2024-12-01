@@ -1,5 +1,5 @@
 from repositories.users_projects_repository import UsersProjectsRepository
-from schemas.users_projects_schema import UserProjectCreate, UserProjectResponse
+from schemas.users_projects_schema import UserProjectCreate
 from services.user_service import UserService
 from services.project_service import ProjectService
 import logging
@@ -10,7 +10,7 @@ class UsersProjectsService:
         self.user_service = UserService()
         self.project_service = ProjectService()
 
-    def create_user_project(self, user_project: UserProjectCreate) -> UserProjectResponse:
+    def create_user_project(self, user_project: UserProjectCreate) -> UserProjectCreate:
         user = self.user_service.get_user_by_id(user_project.user_id)
         if not user:
             raise ValueError("User does not exist")
@@ -31,7 +31,7 @@ class UsersProjectsService:
         user_projects = self.repo.get_user_projects()
         return user_projects
 
-    def get_user_project_by_id(self, id: int) -> UserProjectResponse:
+    def get_user_project_by_id(self, id: int) -> UserProjectCreate:
         if id <= 0:
             raise ValueError("ID must be a positive integer")
 
@@ -47,7 +47,7 @@ class UsersProjectsService:
             raise ValueError("ID must be a positive integer")
         return self.repo.get_user_projects_by_project_id(project_id)
 
-    def update_user_project(self, id: int, user_project: UserProjectCreate) -> UserProjectResponse:
+    def update_user_project(self, id: int, user_project: UserProjectCreate) -> UserProjectCreate:
         user = self.user_service.get_user_by_id(user_project.user_id)
         if not user:
             raise ValueError("User does not exist")

@@ -13,7 +13,9 @@ from routers import (
     project_router,
     role_router,
     user_router,
-    users_projects_router
+    users_projects_router,
+    fee_value_router,
+    human_talent_router,
 )
 
 app = FastAPI()
@@ -54,3 +56,5 @@ app.include_router(activity_router.router, prefix="/api/v1", tags=["Activities"]
 app.include_router(task_router.router, prefix="/api/v1", tags=["Tasks"])
 app.include_router(month_router.router, prefix="/api/v1", tags=["Months"])
 app.include_router(schedule_router.router, prefix="/api/v1", tags=["Schedules"])
+app.include_router(fee_value_router.router, prefix="/api/v1", tags=["Fee Values"])
+app.include_router(human_talent_router.router, prefix="/api/v1", tags=["Human Talents"])

@@ -16,7 +16,8 @@ from routers import (
     users_projects_router,
     fee_value_router,
     human_talent_router,
-    annual_honorariums_router
+    annual_honorariums_router,
+    equipment_software_router
 )
 
 app = FastAPI()
@@ -60,3 +61,4 @@ app.include_router(schedule_router.router, prefix="/api/v1", tags=["Schedules"])
 app.include_router(fee_value_router.router, prefix="/api/v1", tags=["Fee Values"])
 app.include_router(human_talent_router.router, prefix="/api/v1", tags=["Human Talents"])
 app.include_router(annual_honorariums_router.router, prefix="/api/v1", tags=["Annual Honorariums"])
+app.include_router(equipment_software_router.router, prefix="/api/v1", tags=["Equipment Softwares"])

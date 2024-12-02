@@ -1,4 +1,4 @@
-from database import DatabaseConnection
+from database.database import DatabaseConnection
 from schemas.user_schema import UserCreate, UserResponse
 import logging
 

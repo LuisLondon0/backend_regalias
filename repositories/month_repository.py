@@ -1,4 +1,4 @@
-from database import DatabaseConnection
+from database.database import DatabaseConnection
 from schemas.month_schema import MonthCreate, MonthResponse
 import logging
 

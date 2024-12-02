@@ -1,4 +1,4 @@
-from database import DatabaseConnection
+from database.database import DatabaseConnection
 from schemas.counterpart_schema import CounterpartSchema, CounterpartResponse
 import logging
 

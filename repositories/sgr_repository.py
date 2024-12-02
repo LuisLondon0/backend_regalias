@@ -1,4 +1,4 @@
-from database import DatabaseConnection
+from database.database import DatabaseConnection
 from schemas.sgr_schema import SGRSchema, SGRResponse
 import logging
 

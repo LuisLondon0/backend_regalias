@@ -1,4 +1,4 @@
-from database import DatabaseConnection
+from database.database import DatabaseConnection
 from schemas.fee_value_schema import FeeValueCreate, FeeValueResponse
 import logging
 

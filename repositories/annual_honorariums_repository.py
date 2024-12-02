@@ -1,4 +1,4 @@
-from database import DatabaseConnection
+from database.database import DatabaseConnection
 from schemas.annual_honorariums_schema import AnnualHonorariumsSchema, AnnualHonorariumsResponse
 import logging
 

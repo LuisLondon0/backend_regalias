@@ -1,4 +1,4 @@
-from database import DatabaseConnection
+from database.database import DatabaseConnection
 from schemas.project_schema import ProjectCreate, ProjectResponse
 import logging
 
@@ -112,4 +112,47 @@ class ProjectRepository:
                     return True
         except Exception as e:
             logging.error(f"Error deleting project: {e}")
+            raise
+
+    def delete_project_cascade(self, project_id: int) -> bool:
+        try:
+            with DatabaseConnection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("""
+                        DELETE FROM taskschedule WHERE taskid IN (
+                            SELECT taskid FROM tasks WHERE activityid IN (
+                                SELECT activityid FROM activities WHERE specificobjectiveid IN (
+                                    SELECT specificobjectiveid FROM specificobjectives WHERE projectid = %s
+                                )
+                            )
+                        )
+                    """, (project_id,))
+                    
+                    
+                    cursor.execute("""
+                        DELETE FROM tasks WHERE activityid IN (
+                            SELECT activityid FROM activities WHERE specificobjectiveid IN (
+                                SELECT specificobjectiveid FROM specificobjectives WHERE projectid = %s
+                            )
+                        )
+                    """, (project_id,))
+                    
+                    cursor.execute("""
+                        DELETE FROM activities WHERE specificobjectiveid IN (
+                            SELECT specificobjectiveid FROM specificobjectives WHERE projectid = %s
+                        )
+                    """, (project_id,))
+                    
+                    cursor.execute("""
+                        DELETE FROM specificobjectives WHERE projectid = %s
+                    """, (project_id,))
+                    
+                    cursor.execute("""
+                        DELETE FROM projects WHERE projectid = %s
+                    """, (project_id,))
+                    
+                    conn.commit()
+                    return True
+        except Exception as e:
+            logging.error(f"Error deleting project cascade: {e}")
             raise

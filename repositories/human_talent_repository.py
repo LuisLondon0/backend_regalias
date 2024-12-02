@@ -1,4 +1,4 @@
-from database import DatabaseConnection
+from database.database import DatabaseConnection
 from schemas.human_talent_schema import HumanTalentCreate, HumanTalentResponse
 import logging
 

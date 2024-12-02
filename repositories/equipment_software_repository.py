@@ -1,4 +1,4 @@
-from database import DatabaseConnection
+from database.database import DatabaseConnection
 from schemas.equipment_software_schema import EquipmentSoftwareSchema, EquipmentSoftwareResponse
 import logging
 

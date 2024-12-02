@@ -1,4 +1,4 @@
-from database import DatabaseConnection
+from database.database import DatabaseConnection
 from schemas.role_schema import RoleCreate, RoleResponse
 import logging
 

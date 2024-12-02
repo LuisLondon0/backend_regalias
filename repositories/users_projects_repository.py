@@ -1,4 +1,4 @@
-from database import DatabaseConnection
+from database.database import DatabaseConnection
 from schemas.users_projects_schema import UserProjectCreate
 import logging
 
@@ -13,8 +13,6 @@ class UsersProjectsRepository:
                         "INSERT INTO userxproject (userid, projectid) VALUES (%s, %s)", 
                         (user_project.user_id, user_project.project_id)
                     )
-                    row = cursor.fetchone()
-                    id = row[0] if row else None
                     conn.commit()
                     return UserProjectCreate(user_id=user_project.user_id, project_id=user_project.project_id)
         except Exception as e:
@@ -29,7 +27,7 @@ class UsersProjectsRepository:
                     user_projects = cursor.fetchall()
                     if user_projects:
                         return [
-                            UserProjectCreate(user_id=user_project[1], project_id=user_project[2]) 
+                            UserProjectCreate(user_id=user_project[0], project_id=user_project[1]) 
                             for user_project in user_projects
                         ]
                     else:
@@ -45,7 +43,7 @@ class UsersProjectsRepository:
                     cursor.execute("SELECT * FROM userxproject WHERE userprojectid = %s", (id,))
                     user_project = cursor.fetchone()
                     if user_project:
-                        return UserProjectCreate(user_id=user_project[1], project_id=user_project[2])
+                        return UserProjectCreate(user_id=user_project[0], project_id=user_project[1])
                     return None
         except Exception as e:
             logging.error(f"Error fetching user-project relationship by id {id}: {e}")
@@ -59,7 +57,7 @@ class UsersProjectsRepository:
                     user_projects = cursor.fetchall()
                     if user_projects:
                         return [
-                            UserProjectCreate(user_id=user_project[1], project_id=user_project[2]) 
+                            UserProjectCreate(user_id=user_project[0], project_id=user_project[1]) 
                             for user_project in user_projects
                         ]
                     else:
@@ -76,7 +74,7 @@ class UsersProjectsRepository:
                     user_projects = cursor.fetchall()
                     if user_projects:
                         return [
-                            UserProjectCreate(user_id=user_project[1], project_id=user_project[2]) 
+                            UserProjectCreate(user_id=user_project[0], project_id=user_project[1]) 
                             for user_project in user_projects
                         ]
                     else:

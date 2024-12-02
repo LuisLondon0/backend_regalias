@@ -1,4 +1,4 @@
-from database import DatabaseConnection
+from database.database import DatabaseConnection
 from schemas.task_schema import TaskCreate, TaskResponse
 import logging
 

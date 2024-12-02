@@ -1,4 +1,4 @@
-from database import DatabaseConnection
+from database.database import DatabaseConnection
 from schemas.activity_schema import ActivityCreate, ActivityResponse
 import logging
 

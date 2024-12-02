@@ -1,4 +1,4 @@
-from database import DatabaseConnection
+from database.database import DatabaseConnection
 from schemas.specific_objective_schema import SpecificObjectiveCreate, SpecificObjectiveResponse
 import logging
 
@@ -29,7 +29,7 @@ class SpecificObjectiveRepository:
                     specific_objectives = cursor.fetchall()
                     if specific_objectives:
                         return [
-                            SpecificObjectiveResponse(id=specific_objective[0], description=specific_objective[1], project_id=specific_objective[2]) 
+                            SpecificObjectiveResponse(id=specific_objective[0], description=specific_objective[2], project_id=specific_objective[1]) 
                             for specific_objective in specific_objectives
                         ]
                     else:
@@ -45,7 +45,7 @@ class SpecificObjectiveRepository:
                     cursor.execute("SELECT * FROM specificobjectives WHERE specificobjectiveid = %s", (specific_objective_id,))
                     specific_objective = cursor.fetchone()
                     if specific_objective:
-                        return SpecificObjectiveResponse(id=specific_objective[0], description=specific_objective[1], project_id=specific_objective[2])
+                        return SpecificObjectiveResponse(id=specific_objective[0], description=specific_objective[2], project_id=specific_objective[1])
                     return None
         except Exception as e:
             logging.error(f"Error fetching specific objective by id {specific_objective_id}: {e}")

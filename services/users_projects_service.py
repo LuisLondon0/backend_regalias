@@ -23,7 +23,7 @@ class UsersProjectsService:
             raise ValueError("This user is already associated with the specified project")
 
         response = self.repo.create_user_project(user_project)
-        logging.info(f"User-Project relationship created with ID: {response.id}")
+        logging.info(f"User-Project relationship created with ID")
 
         return response
 

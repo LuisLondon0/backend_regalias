@@ -3,6 +3,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import logging
+from database.database_pool import DatabasePool
+import atexit
 
 from routers import (
     month_router,
@@ -22,6 +24,7 @@ from routers import (
     sgr_router
 )
 
+DatabasePool.initialize()
 app = FastAPI()
 
 app.add_middleware(
@@ -66,3 +69,5 @@ app.include_router(annual_honorariums_router.router, prefix="/api/v1", tags=["An
 app.include_router(equipment_software_router.router, prefix="/api/v1", tags=["Equipment Softwares"])
 app.include_router(counterpart_router.router, prefix="/api/v1", tags=["Counterparts"])
 app.include_router(sgr_router.router, prefix="/api/v1", tags=["SGRs"])
+
+atexit.register(DatabasePool.close_pool)

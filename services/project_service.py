@@ -3,7 +3,6 @@ from schemas.project_schema import ProjectCreate, ProjectResponse
 from schemas.specific_objective_schema import SpecificObjectiveCreate, SpecificObjectiveResponse
 from schemas.activity_schema import ActivityCreate, ActivityResponse
 from schemas.task_schema import TaskCreate, TaskResponse
-from schemas.month_schema import MonthCreate, MonthResponse
 from schemas.schedule_schema import ScheduleCreate, ScheduleResponse
 from fastapi import UploadFile, HTTPException
 from typing import List
@@ -83,43 +82,48 @@ class ProjectService:
                 if index in activities_index:
                     act_activities = activities.pop(0)
                     activity_create = ActivityCreate(
-                        specificobjective_id=specific_objective_response.id,
+                        specific_objective_id=specific_objective_response.id,
                         description=act_activities,
-                        product=row["Productos \n(Consultar manual sector 39 programa 3906)"],
-                        verificationmethod=row["Medio de verificación \n(del cumplimiento de la actividad)"],
-                        productindicator=row["Indicador de producto\n(colocar la meta a la que se quiere llegar con el producto por ejemplo # de estudiantes de doctorado)"],
+                        product=None if pd.isna(row.get('Productos \n(Consultar manual sector 39 programa 3906)', None)) 
+                        else str(row['Productos \n(Consultar manual sector 39 programa 3906)']),
+                        verification_method=None if pd.isna(row.get('Medio de verificación \n(del cumplimiento de la actividad)', None)) 
+                        else row['Medio de verificación \n(del cumplimiento de la actividad)'],
+                        product_indicator=None if pd.isna(row.get('Indicador de producto\n(colocar la meta a la que se quiere llegar con el producto por ejemplo # de estudiantes de doctorado)', None)) 
+                        else str(row['Indicador de producto\n(colocar la meta a la que se quiere llegar con el producto por ejemplo # de estudiantes de doctorado)'])
                     )
                     activity_response = activity_service.create_activity(activity_create)
 
                 task_create = TaskCreate(
                     activity_id=activity_response.id,
-                    description=row["Tareas"],
-                    responsible=row["Responsable \n(Entidad)"],
-                    requiredstaff=row["Personal requerido (perfiles y descripción)"],
-                    activityresult=row["Resultados de la actividad"],
-                    technical_requirement=row["Requerimientos técnicos, tecnológicos, logísticos"]
+                    description=row['Tareas'],
+                    responsible=None if pd.isna(row.get('Responsable \n(Entidad)', None))
+                    else row['Responsable \n(Entidad)'],
+                    required_personnel=None if pd.isna(row.get('Personal requerido (perfiles y descripción)', None))
+                    else row['Personal requerido (perfiles y descripción)'],
+                    activity_results=None if pd.isna(row.get('Resultados de la actividad', None))
+                    else row['Resultados de la actividad'],
+                    verification_method=None if pd.isna(row.get('Medio de verificación', None))
+                    else row['Medio de verificación'],
+                    technical_requirement=None if pd.isna(row.get('Requerimientos técnicos, tecnológicos, logísticos', None))
+                    else row['Requerimientos técnicos, tecnológicos, logísticos']
                 )
                 task_response = task_service.create_task(task_create)
             
                 schedule = df_schedule.get(index)
 
                 for i in schedule:
-                    month_create = MonthCreate(
-                        task_id=task_response.id,
-                        month=i
-                    )
-                    month_response = month_service.create_month(month_create)
-
                     schedule_create = ScheduleCreate(
-                        month_id=month_response.id,
+                        month_id=i,
                         task_id=task_response.id
                     )
                     schedule_service.create_schedule(schedule_create)
 
             logging.info(f"Project created from Excel file")
-            return True
+            return [project_response]
         except Exception as e:
             logging.error(f"Error processing Excel file: {e}")
+            if project_response:
+                self.delete_project_cascade(project_response.id)
             raise HTTPException(status_code=400, detail="Error processing Excel file")
 
     def get_projects(self):
@@ -156,3 +160,10 @@ class ProjectService:
             logging.warning(f"Project with ID: {project_id} not found")
 
         return success
+    
+    def delete_project_cascade(self, project_id: int) -> bool:
+        try:
+            return self.repo.delete_project_cascade(project_id)
+        except Exception as e:
+            logging.error(f"Error in service while deleting project cascade: {e}")
+            raise

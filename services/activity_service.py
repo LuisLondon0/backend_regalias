@@ -62,3 +62,9 @@ class ActivityService:
             logging.warning(f"Activity with ID: {activity_id} not found")
 
         return success
+    
+    def get_activities_ids_by_project_id(self, project_id: int):
+        if project_id <= 0:
+            raise ValueError("ID must be a positive integer")
+
+        return self.repo.get_activities_ids_by_project_id(project_id)

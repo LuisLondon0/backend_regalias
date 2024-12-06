@@ -37,6 +37,31 @@ class ActivityRepository:
         except Exception as e:
             logging.error(f"Error fetching activities: {e}")
             raise
+    
+    def get_activities_ids_by_project_id(self, project_id: int):
+        try:
+            with DatabaseConnection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("""  SELECT 
+                                            a.ActivityID
+                                        FROM 
+                                            Activities a
+                                        INNER JOIN SpecificObjectives so ON a.SpecificObjectiveID = so.SpecificObjectiveID
+                                        INNER JOIN Projects p ON so.ProjectID = p.ProjectID
+                                        WHERE 
+                                            p.ProjectID = %s;
+                                   """, (project_id,))
+                    activities = cursor.fetchall()
+                    if activities:
+                        return [
+                            activity[0] 
+                            for activity in activities
+                        ]
+                    else:
+                        return []
+        except Exception as e:
+            logging.error(f"Error fetching activities: {e}")
+            raise
 
     def get_activity_by_id(self, activity_id: int):
         try:

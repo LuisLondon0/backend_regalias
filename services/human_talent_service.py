@@ -1,5 +1,6 @@
 from repositories.human_talent_repository import HumanTalentRepository
 from schemas.human_talent_schema import HumanTalentCreate, HumanTalentResponse
+from schemas.annual_honorariums_schema import AnnualHonorariumsSchema, AnnualHonorariumsResponse
 from services.activity_service import ActivityService
 from services.fee_value_service import FeeValueService
 import logging, re
@@ -90,18 +91,21 @@ class HumanTalentService:
             from services.activity_service import ActivityService
             from services.task_service import TaskService
             from services.gemini_service import gemini_service
+            from services.annual_honorariums_service import AnnualHonorariumsService
 
             activity_service = ActivityService()
             task_service = TaskService()
+            annual_honorariums_service = AnnualHonorariumsService()
             gemini_service = gemini_service()
 
             activities = activity_service.get_activities_ids_by_project_id(id)
+            feevalues = self.fee_value_service.get_fee_values()
 
             #for activity in activities[2:4]:
             for activity in activities[:1]:
                 tasks = task_service.get_tasks_by_activity(activity)
                 data = ""
-                for task in tasks:
+                for task in tasks[1:4]:
                     data = data + f"[Personnel: {task["required_personnel"]}, Months: {task["months_required"]}], "
                 response = gemini_service.generate_human_talent(data)
 
@@ -134,15 +138,42 @@ class HumanTalentService:
                     })
 
                 for entry in processed_entries:
+                    datos = {"personel": entry['role'], "tasks": entry['description'], "months": entry['months']}
+                    fes = gemini_service.get_fee_value_talent(datos, feevalues)
+
+                    match = re.match(r"\[(\d+)\], ([\d.]+)", fes)
+                    asd = int(match.group(1))
+                    money = float(match.group(2))
+                    h_money = round(money/31/8, 2)
+                    
                     human_talent = HumanTalentCreate(
                         activityid=activity,
-                        feevalueid=1,
+                        feevalueid=asd,
                         entity="",
                         position=entry['role'],
                         justification=entry['description'] if entry['description'] else "N/A",
                         quantity=entry['quantity']
                     )
-                    self.create_human_talent(human_talent)
+                    human_response = self.create_human_talent(human_talent)
+                    
+                    
+                    res = gemini_service.get_human_talent_hours(datos)
+
+                    hours = [int(num.strip()) for num in res.replace("[", "").replace("]", "").split(",")]
+
+                    for i in range(3):
+                        annual = AnnualHonorariumsSchema(
+                            talentid=human_response.id,
+                            honorariumamount=0,
+                            hourvalue=str(h_money),
+                            year=i+1,
+                            weekofyears=hours[i+1],
+                            totalamount=h_money*hours[0]*hours[i+1]
+                        )
+                        annual_response = annual_honorariums_service.create_annual_honorarium(annual)
+
+                    
+
             return True
         except Exception as e:
             logging.error(f"Error creating budget: {e}")

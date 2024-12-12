@@ -11,7 +11,7 @@ class FeeValueRepository:
                 with conn.cursor() as cursor:
                     cursor.execute(
                         """
-                        INSERT INTO feevalues (managmentlevel, category, academicsuitability, minimumexperience, monthlyfee, monthlyfeewithtaxes) 
+                        INSERT INTO feevalues (managementlevel, category, academicsuitability, minimumexperience, monthlyfee, monthlyfeewithtax) 
                         VALUES (%s, %s, %s, %s, %s, %s) RETURNING feevalueid
                         """, 
                         (fee_value.managmentlevel, fee_value.category, fee_value.academicsuitability, fee_value.minimumexperience, fee_value.monthlyfee, fee_value.monthlyfeewithtaxes)
@@ -85,7 +85,7 @@ class FeeValueRepository:
                     cursor.execute(
                         """
                         UPDATE feevalues 
-                        SET managmentlevel = %s, category = %s, academicsuitability = %s, minimumexperience = %s, monthlyfee = %s, monthlyfeewithtaxes = %s 
+                        SET managementlevel = %s, category = %s, academicsuitability = %s, minimumexperience = %s, monthlyfee = %s, monthlyfeewithtax = %s 
                         WHERE feevalueid = %s
                         """, 
                         (fee_value.managmentlevel, fee_value.category, fee_value.academicsuitability, fee_value.minimumexperience, fee_value.monthlyfee, fee_value.monthlyfeewithtaxes, fee_value_id)

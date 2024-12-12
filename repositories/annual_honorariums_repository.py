@@ -11,7 +11,7 @@ class AnnualHonorariumsRepository:
                 with conn.cursor() as cursor:
                     cursor.execute(
                         """
-                        INSERT INTO annualhonorariums (talentid, honorariumamount, hourvalue, year, weekofyears, totalamount) 
+                        INSERT INTO annualhonorariums (talentid, honorariumamount, hourvalue, year, weeksoryears, totalamount) 
                         VALUES (%s, %s, %s, %s, %s, %s) RETURNING honorariumid
                         """, 
                         (honorarium.talentid, honorarium.honorariumamount, honorarium.hourvalue, honorarium.year, honorarium.weekofyears, honorarium.totalamount)
@@ -85,7 +85,7 @@ class AnnualHonorariumsRepository:
                     cursor.execute(
                         """
                         UPDATE annualhonorariums 
-                        SET talentid = %s, honorariumamount = %s, hourvalue = %s, year = %s, weekofyears = %s, totalamount = %s 
+                        SET talentid = %s, honorariumamount = %s, hourvalue = %s, year = %s, weeksoryears = %s, totalamount = %s 
                         WHERE honorariumid = %s
                         """, 
                         (honorarium.talentid, honorarium.honorariumamount, honorarium.hourvalue, honorarium.year, honorarium.weekofyears, honorarium.totalamount, honorarium_id)

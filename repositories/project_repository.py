@@ -1,5 +1,6 @@
 from database.database import DatabaseConnection
 from schemas.project_schema import ProjectCreate, ProjectResponse
+from schemas.summary_schema import Summary, SummaryResponse
 import logging
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -155,4 +156,29 @@ class ProjectRepository:
                     return True
         except Exception as e:
             logging.error(f"Error deleting project cascade: {e}")
+            raise
+
+
+    def get_summary(self):
+        try:
+            with DatabaseConnection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("SELECT resourcetype, SUM(cash) from sgr GROUP BY resourcetype")
+                    summary = cursor.fetchall()
+                    if summary:
+                        summaries = [
+                            Summary(
+                                heading=row[0],  # Rubro
+                                totalsgr=row[1]  # Total
+                            )
+                            for row in summary
+                        ]
+                        
+                        # Retornar como objeto SummaryResponse
+                        return SummaryResponse(response=summaries)
+                    else:
+                        # Retornar lista vacía en la estructura esperada
+                        return SummaryResponse(response=[])
+        except Exception as e:
+            logging.error(f"Error fetching projects: {e}")
             raise

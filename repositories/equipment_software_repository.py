@@ -135,11 +135,14 @@ class EquipmentSoftwareRepository:
 
     def generate_equipment_softwares(self):
         query = """
-                SELECT COALESCE(T0.description, '') AS description , COALESCE(T0.activityresults, '') AS activityresults, T0.activityid AS activityid
+                SELECT COALESCE(T0.description, '') AS description , 
+                COALESCE(T0.activityresults, '') AS activityresults, 
+                T0.activityid AS activityid
                 FROM tasks T0
                 WHERE T0.activityid = (
                     SELECT activityid
                     FROM activities
+					WHERE activityid != (SELECT DISTINCT activityid FROM equipmentsoftware)
                     ORDER BY activityid ASC
                     LIMIT 1
                 );
@@ -160,6 +163,7 @@ class EquipmentSoftwareRepository:
                         justification = lines[2]
                         price = self.get_equipment_software_price(equipment)
                         price = Decimal(price) if price else Decimal(0)
+                        price = price.quantize(Decimal('1')) 
                         if equipment != "":
                             cursor.execute(
                                 """
@@ -169,6 +173,16 @@ class EquipmentSoftwareRepository:
                                 (row[2], "", equipment_software, justification, 1, "", price, price)
                             )
                             inserted_id = cursor.fetchone()[0]
+                            conn.commit()
+
+                            cursor.execute(
+                                """
+                                INSERT INTO sgr (resourceid, resourcetype, cash) 
+                                VALUES (%s, %s, %s) RETURNING resourceid
+                                """, 
+                                (inserted_id, "equipmentsoftware", price)
+                            )
+                            second_inserted_id = cursor.fetchone()[0]
                             conn.commit()
                 cursor.close()
             conn.close()

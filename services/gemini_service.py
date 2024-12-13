@@ -8,8 +8,12 @@ class gemini_service:
 
     def generate_equipment_software(self, task, result):
 
-        prompt = f"Eres un experto en la planeacion de proyectos, dime solamente un hardware (con el siguiente formato: equipo:, características: procesador, ram, almacenamiento), solamente un software (con el siguiente formato: nombre: , caracteristica:) y solamente una justificación (con el siguiente formato: justificación) que se necesite para realizar la siguiente actividad: {task} y obtener el siguiente resultado: {result}. NO JUSTIFIQUES NI AÑADAS NOTAS, NO ME CAMBIES LOS FORMATOS NI LE AGREGUES TITULOS O SUBTITULOS A LA RESPUESTA, SOLO DIME LO QUE PEDI"
+        if result is None or result == "":
+            prompt = f"Eres un experto en la planeacion de proyectos, dime solamente un hardware (con el siguiente formato: equipo:, características: procesador, ram, almacenamiento), solamente un software (con el siguiente formato: nombre: , caracteristica:) y solamente una justificación (con el siguiente formato: justificación) que se necesite para realizar la siguiente actividad: {task}. NO JUSTIFIQUES NI AÑADAS NOTAS, NO ME CAMBIES LOS FORMATOS NI LE AGREGUES TITULOS O SUBTITULOS A LA RESPUESTA, SOLO DIME LO QUE PEDI"
+        else:
+            prompt = f"Eres un experto en la planeacion de proyectos, dime solamente un hardware (con el siguiente formato: equipo:, características: procesador, ram, almacenamiento), solamente un software (con el siguiente formato: nombre: , caracteristica:) y solamente una justificación (con el siguiente formato: justificación) que se necesite para realizar la siguiente actividad: {task} y obtener el siguiente resultado: {result}. NO JUSTIFIQUES NI AÑADAS NOTAS, NO ME CAMBIES LOS FORMATOS NI LE AGREGUES TITULOS O SUBTITULOS A LA RESPUESTA, SOLO DIME LO QUE PEDI"
         
+        print(prompt)
         response = self.model.generate_content(prompt)
         print(response.text)
 

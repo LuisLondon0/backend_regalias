@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, UploadFile, File
 from typing import List
 from services.project_service import ProjectService
 from schemas.project_schema import ProjectCreate, ProjectResponse
-
+from schemas.summary_schema import Summary, SummaryResponse
 router = APIRouter()
 service = ProjectService()
 
@@ -35,3 +35,10 @@ def delete_project(project_id: int):
     if not success:
         raise HTTPException(status_code=404, detail="Project not found")
     return success
+
+@router.get("/summary", response_model=SummaryResponse)
+def get_summary():
+    summary = service.get_summary()
+    if summary is None:
+        raise HTTPException(status_code=404, detail="Summary not found")
+    return summary

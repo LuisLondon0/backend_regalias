@@ -167,3 +167,7 @@ class ProjectService:
         except Exception as e:
             logging.error(f"Error in service while deleting project cascade: {e}")
             raise
+
+    def get_summary(self):
+        projects = self.repo.get_summary()
+        return projects

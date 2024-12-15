@@ -102,7 +102,7 @@ class HumanTalentService:
             feevalues = self.fee_value_service.get_fee_values()
 
             #for activity in activities[2:4]:
-            for activity in activities[:1]:
+            for activity in activities[1:3]:
                 tasks = task_service.get_tasks_by_activity(activity)
                 data = ""
                 for task in tasks[1:4]:
@@ -178,3 +178,9 @@ class HumanTalentService:
         except Exception as e:
             logging.error(f"Error creating budget: {e}")
             raise
+
+    def get_budget_per_talent(self):
+        return self.repo.get_budget_per_talent()
+    
+    def get_total_budget_per_talent(self):
+        return self.repo.get_total_budget_per_talent()

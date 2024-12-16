@@ -31,3 +31,15 @@ def delete_human_talent(human_talent_id: int):
     if not success:
         raise HTTPException(status_code=404, detail="Human talent not found")
     return success
+
+@router.post("/human_talents/budget/{project_id}", response_model=bool)
+def create_budget(project_id: int):
+    return service.create_budget(project_id)
+
+@router.get("/human_talents/budget_per_talent/")
+def get_budget_per_talent():
+    return service.get_budget_per_talent()
+
+@router.get("/human_talents/total_budget_per_talent/")
+def get_total_budget_per_talent():
+    return service.get_total_budget_per_talent()

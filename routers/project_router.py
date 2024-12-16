@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, UploadFile, File
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form
 from typing import List
 from services.project_service import ProjectService
 from schemas.project_schema import ProjectCreate, ProjectResponse
@@ -8,11 +8,11 @@ service = ProjectService()
 
 @router.post("/projects", response_model=ProjectResponse)
 def create_project(project: ProjectCreate):
-    return service.create_project(project)
+    return service.create_project(project=project, user_id=project.user_id)
 
 @router.post("/projects/from-excel", response_model=List[ProjectResponse])
-async def create_projects_from_excel(file: UploadFile = File(...)):
-    return await service.create_projects_from_excel(file)
+async def create_projects_from_excel(file: UploadFile = File(...), userId: int = Form(...)) :
+    return await service.create_projects_from_excel(file, userId)
 
 @router.get("/projects", response_model=List[ProjectResponse])
 def get_projects():
@@ -42,3 +42,7 @@ def get_summary():
     if summary is None:
         raise HTTPException(status_code=404, detail="Summary not found")
     return summary
+
+@router.get("/projects/{project_id}/total-talent-budget")
+def get_total_talent_budget(project_id: int):
+    return service.get_total_talent_budget(project_id)

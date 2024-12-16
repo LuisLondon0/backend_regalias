@@ -9,23 +9,32 @@ from typing import List
 import pandas as pd
 import logging
 
+from schemas.users_projects_schema import UserProjectCreate
+
 class ProjectService:
     def __init__(self):
         self.repo = ProjectRepository()
 
-    def create_project(self, project: ProjectCreate) -> ProjectResponse:
+    def create_project(self, project: ProjectCreate, user_id: int) -> ProjectResponse:
+        from services.users_projects_service import UsersProjectsService
+
+        usersService = UsersProjectsService()
+
         if not project.description:
             raise ValueError("Description cannot be empty")
 
         project.description = project.description.strip()
 
-        response = self.repo.create_project(project)
+        project_response = self.repo.create_project(project)
 
-        logging.info(f"Project created with ID: {response.id}")
+        user_project_create = UserProjectCreate(user_id=user_id, project_id=project_response.id)
+        usersService.create_user_project(user_project=user_project_create)
 
-        return response
+        logging.info(f"Project created with ID: {project_response.id} and associated with user ID: {user_id}")
+
+        return project_response
     
-    async def create_projects_from_excel(self, file: UploadFile) -> List[ProjectResponse]:
+    async def create_projects_from_excel(self, file: UploadFile, user_id: int) -> List[ProjectResponse]:
         from services.specific_objective_service import SpecificObjectiveService
         from services.activity_service import ActivityService
         from services.task_service import TaskService
@@ -62,7 +71,7 @@ class ProjectService:
                 totalsgr=None,
                 totalduration=None
             )
-            project_response = self.create_project(project_create)
+            project_response = self.create_project(project_create, user_id)
 
             specific_objectives = filtered_df["Objetivos Específicos"].dropna().tolist()
             specific_objectives_index = filtered_df["Objetivos Específicos"].dropna().index.tolist()
@@ -167,7 +176,11 @@ class ProjectService:
         except Exception as e:
             logging.error(f"Error in service while deleting project cascade: {e}")
             raise
-
+            
     def get_summary(self):
         projects = self.repo.get_summary()
         return projects
+
+    def get_total_talent_budget(self, project_id: int):
+        return self.repo.get_total_talent_budget(project_id)
+

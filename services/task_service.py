@@ -62,3 +62,7 @@ class TaskService:
             logging.warning(f"Task with ID: {task_id} not found")
 
         return success
+    
+    def get_tasks_by_activity(self, activity_id: int):
+        tasks = self.repo.get_tasks_by_activity(activity_id)
+        return tasks

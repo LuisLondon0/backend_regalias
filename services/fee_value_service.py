@@ -17,7 +17,7 @@ class FeeValueService:
             raise ValueError("Minimum experience cannot be negative")
         if fee_value.monthlyfee < 0:
             raise ValueError("Monthly fee cannot be negative")
-        if fee_value.monthlyfeewithouttaxes < 0:
+        if fee_value.monthlyfeewithtaxes < 0:
             raise ValueError("Monthly fee without taxes cannot be negative")
 
         fee_value.managmentlevel = fee_value.managmentlevel.strip()
@@ -50,7 +50,7 @@ class FeeValueService:
             raise ValueError("Minimum experience cannot be negative")
         if fee_value.monthlyfee < 0:
             raise ValueError("Monthly fee cannot be negative")
-        if fee_value.monthlyfeewithouttaxes < 0:
+        if fee_value.monthlyfeewithtaxes < 0:
             raise ValueError("Monthly fee without taxes cannot be negative")
 
         fee_value.managmentlevel = fee_value.managmentlevel.strip()

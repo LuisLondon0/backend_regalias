@@ -31,3 +31,7 @@ def delete_equipment_software(equipment_software_id: int):
     if not success:
         raise HTTPException(status_code=404, detail="Equipment software not found")
     return success
+
+@router.get("/generate_equipment_softwares", response_model=bool)
+def generate_equipment_softwares():
+    return service.generate_equipment_softwares()

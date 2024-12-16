@@ -87,3 +87,7 @@ class EquipmentSoftwareService:
             logging.warning(f"Equipment software with ID: {equipment_software_id} not found")
 
         return success
+    
+
+    def generate_equipment_softwares(self):
+        return self.repo.generate_equipment_softwares()

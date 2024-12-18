@@ -179,8 +179,8 @@ class HumanTalentService:
             logging.error(f"Error creating budget: {e}")
             raise
 
-    def get_budget_per_talent(self):
-        return self.repo.get_budget_per_talent()
+    def get_budget_per_talent(self, id):
+        return self.repo.get_budget_per_talent(id)
     
-    def get_total_budget_per_talent(self):
-        return self.repo.get_total_budget_per_talent()
+    def get_total_budget_per_talent(self, id):
+        return self.repo.get_total_budget_per_talent(id)

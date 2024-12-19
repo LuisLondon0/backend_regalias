@@ -24,15 +24,11 @@ def get_user_project_by_id(id: int):
 @router.get("/users-projects/user/{user_id}", response_model=List[UserProjectCreate])
 def get_user_projects_by_user_id(user_id: int):
     user_projects = service.get_user_projects_by_user_id(user_id)
-    if not user_projects:
-        raise HTTPException(status_code=404, detail="User-Project relationships not found for user_id")
     return user_projects
 
 @router.get("/users-projects/project/{project_id}", response_model=List[UserProjectCreate])
 def get_user_projects_by_project_id(project_id: int):
     user_projects = service.get_user_projects_by_project_id(project_id)
-    if not user_projects:
-        raise HTTPException(status_code=404, detail="User-Project relationships not found for project_id")
     return user_projects
 
 @router.put("/users-projects/{id}", response_model=UserProjectCreate)

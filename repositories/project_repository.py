@@ -1,5 +1,6 @@
 from database.database import DatabaseConnection
 from schemas.project_schema import ProjectCreate, ProjectResponse
+from schemas.summary_schema import Summary, SummaryResponse
 import logging
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -155,4 +156,64 @@ class ProjectRepository:
                     return True
         except Exception as e:
             logging.error(f"Error deleting project cascade: {e}")
+            raise
+
+    def get_summary(self):
+        try:
+            with DatabaseConnection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("SELECT resourcetype, SUM(cash) from sgr GROUP BY resourcetype")
+                    summary = cursor.fetchall()
+                    if summary:
+                        summaries = [
+                            Summary(
+                                heading=row[0],  # Rubro
+                                totalsgr=row[1]  # Total
+                            )
+                            for row in summary
+                        ]
+                        
+                        # Retornar como objeto SummaryResponse
+                        return SummaryResponse(response=summaries)
+                    else:
+                        # Retornar lista vacía en la estructura esperada
+                        return SummaryResponse(response=[])
+        except Exception as e:
+            logging.error(f"Error fetching projects: {e}")
+            raise
+
+    def get_total_talent_budget(self, project_id: int):
+        try:
+            with DatabaseConnection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("""
+                        SELECT 
+                            p.ProjectID AS ProjectID,
+                            p.Description AS ProjectDescription,
+                            SUM(ah.TotalAmount) AS TotalHonorariumAmount
+                        FROM 
+                            Projects p
+                        INNER JOIN 
+                            SpecificObjectives so ON p.ProjectID = so.ProjectID
+                        INNER JOIN 
+                            Activities a ON so.SpecificObjectiveID = a.SpecificObjectiveID
+                        INNER JOIN 
+                            HumanTalent ht ON a.ActivityID = ht.ActivityID
+                        INNER JOIN 
+                            AnnualHonorariums ah ON ht.TalentID = ah.TalentID
+                        WHERE 
+                            p.ProjectID = %s
+                        GROUP BY 
+                            p.ProjectID, p.Description;
+                    """, (project_id,))
+                    total = cursor.fetchone()
+
+                    dicti = {
+                        'project_id': total[0],
+                        'project_description': total[1],
+                        'total_talent_amount': total[2]
+                    }
+                    return dicti
+        except Exception as e:
+            logging.error(f"Error fetching total talent budget: {e}")
             raise

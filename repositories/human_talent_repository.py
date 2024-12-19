@@ -117,3 +117,97 @@ class HumanTalentRepository:
         except Exception as e:
             logging.error(f"Error deleting human talent: {e}")
             raise
+
+    def get_budget_per_talent(self, project_id: int):
+        try:
+            with DatabaseConnection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(
+                        """
+                        SELECT 
+                            ht.TalentID AS TalentID,
+                            ht.Position AS Position,
+                            ht.Justification AS Justification,
+                            ht.Quantity AS Quantity,
+                            ah.HourValue AS HourValue,
+                            ah.Year AS Year,
+                            ah.WeeksOrYears AS WeeksOrYears,
+                            ah.TotalAmount AS TotalAmount
+                        FROM 
+                            HumanTalent ht
+                        INNER JOIN 
+                            AnnualHonorariums ah ON ht.TalentID = ah.TalentID
+                        INNER JOIN 
+                            Activities a ON ht.ActivityID = a.ActivityID
+                        INNER JOIN 
+                            SpecificObjectives so ON a.SpecificObjectiveID = so.SpecificObjectiveID
+                        INNER JOIN 
+                            Projects p ON so.ProjectID = p.ProjectID
+                        WHERE 
+                            p.ProjectID = %s;
+                        """
+                    , (project_id,))
+                    budget_per_talent = cursor.fetchall()
+                    answer = []
+                    for talent in budget_per_talent:
+                        talent_dict = {
+                            "TalentID": talent[0],
+                            "Position": talent[1],
+                            "Justification": talent[2],
+                            "Quantity": talent[3],
+                            "HourValue": talent[4],
+                            "Year": talent[5],
+                            "WeeksOrYears": talent[6],
+                            "TotalAmount": talent[7]
+                        }
+                        answer.append(talent_dict)
+                    return answer
+        except Exception as e:
+            logging.error(f"Error fetching budget per talent: {e}")
+            raise
+
+    def get_total_budget_per_talent(self, project_id: int):
+        try:
+            with DatabaseConnection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(
+                        """
+                        SELECT 
+                            ht.TalentID AS TalentID,
+                            ht.Position AS Position,
+                            ht.Justification AS Justification,
+                            ht.Quantity AS Quantity,
+                            SUM(ah.TotalAmount) AS TotalHonorariumAmount
+                        FROM 
+                            HumanTalent ht
+                        INNER JOIN 
+                            AnnualHonorariums ah ON ht.TalentID = ah.TalentID
+                        INNER JOIN 
+                            Activities a ON ht.ActivityID = a.ActivityID
+                        INNER JOIN 
+                            SpecificObjectives so ON a.SpecificObjectiveID = so.SpecificObjectiveID
+                        INNER JOIN 
+                            Projects p ON so.ProjectID = p.ProjectID
+                        WHERE 
+                            p.ProjectID = %s
+                        GROUP BY 
+                            ht.TalentID, ht.Position, ht.Justification, ht.Quantity;
+                        """
+                    , (project_id,))
+                    total_budget_per_talent = cursor.fetchall()
+
+                    answer = []
+                    for talent in total_budget_per_talent:
+                        talent_dict = {
+                            "TalentID": talent[0],
+                            "Position": talent[1],
+                            "Justification": talent[2],
+                            "Quantity": talent[3],
+                            "TotalHonorariumAmount": talent[4]
+                        }
+                        answer.append(talent_dict) 
+
+                    return answer
+        except Exception as e:
+            logging.error(f"Error fetching total budget per talent: {e}")
+            raise

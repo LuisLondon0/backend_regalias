@@ -78,3 +78,39 @@ class TaskRepository:
         except Exception as e:
             logging.error(f"Error deleting task: {e}")
             raise
+    
+    def get_tasks_by_activity(self, activity_id: int):
+        try:
+            with DatabaseConnection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("""
+                                    SELECT 
+                                        t.Description AS TaskDescription,
+                                        t.RequiredPersonnel,
+                                        t.Responsible,
+                                        STRING_AGG(m.Month, ', ') AS MonthsRequired
+                                    FROM 
+                                        Tasks t
+                                    LEFT JOIN TaskSchedule ts ON t.TaskID = ts.TaskID
+                                    LEFT JOIN Months m ON ts.MonthID = m.MonthID
+                                    WHERE 
+                                        t.ActivityID = %s
+                                    GROUP BY 
+                                        t.TaskID, t.Description, t.RequiredPersonnel, t.Responsible;
+                                    """, (activity_id,))
+                    tasks = cursor.fetchall()
+                    if tasks:
+                        return [
+                            {
+                                "task_description": task[0],
+                                "required_personnel": task[1],
+                                "responsible": task[2],
+                                "months_required": task[3]
+                            }
+                            for task in tasks
+                        ]
+                    else:
+                        return []
+        except Exception as e:
+            logging.error(f"Error fetching tasks by activity: {e}")
+            raise

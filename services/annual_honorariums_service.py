@@ -19,7 +19,7 @@ class AnnualHonorariumsService:
             raise ValueError("Total amount cannot be negative")
         if honorarium.year <= 0:
             raise ValueError("Year must be a positive integer")
-        if honorarium.weekofyears <= 0:
+        if honorarium.weekofyears < 0:
             raise ValueError("Week of years must be a positive integer")
 
         honorarium.hourvalue = honorarium.hourvalue.strip()

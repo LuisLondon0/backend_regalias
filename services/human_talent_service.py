@@ -101,8 +101,8 @@ class HumanTalentService:
             activities = activity_service.get_activities_ids_by_project_id(id)
             feevalues = self.fee_value_service.get_fee_values()
 
-            #for activity in activities[2:4]:
-            for activity in activities[1:3]:
+            #for activity in activities[1:3]:
+            for activity in activities[9:11]:
                 tasks = task_service.get_tasks_by_activity(activity)
                 data = ""
                 for task in tasks[1:4]:

@@ -207,3 +207,26 @@ class EquipmentSoftwareRepository:
         response_json = response.json()
         print(response_json)
         return float(response_json["Average price"])
+    
+    def get_equipment_software_by_project_id(self, project_id: int):
+        try:
+            with DatabaseConnection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("SELECT T4.* FROM projects T1 JOIN specificobjectives T2 ON T1.projectid = T2.projectid JOIN activities T3 ON T2.specificobjectiveid = T3.specificobjectiveid JOIN equipmentsoftware T4 ON T3.activityid = T4.activityid WHERE T1.projectid = %s", (project_id,))
+                    equipment_software = cursor.fetchone()
+                    if equipment_software:
+                        return EquipmentSoftwareResponse(
+                            id=equipment_software[0], 
+                            activity_id=equipment_software[1],
+                            entity=equipment_software[2],
+                            description=equipment_software[3],
+                            justification=equipment_software[4],
+                            quantity=equipment_software[5],
+                            propertyoradministration=equipment_software[6],
+                            unitvalue=equipment_software[7],
+                            total=equipment_software[8]
+                        )
+                    return None
+        except Exception as e:
+            logging.error(f"Error fetching equipment software by id {project_id}: {e}")
+            raise

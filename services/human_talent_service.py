@@ -106,7 +106,7 @@ class HumanTalentService:
                 tasks = task_service.get_tasks_by_activity(activity)
                 data = ""
                 for task in tasks[1:4]:
-                    data = data + f"[Personnel: {task["required_personnel"]}, Months: {task["months_required"]}], "
+                    data = data + f'[Personnel: {task["required_personnel"]}, Months: {task["months_required"]}], '
                 response = gemini_service.generate_human_talent(data)
 
                 entries = re.findall(r'\[Personnel: (.*?)\]', response)

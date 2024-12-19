@@ -91,3 +91,9 @@ class EquipmentSoftwareService:
 
     def generate_equipment_softwares(self):
         return self.repo.generate_equipment_softwares()
+    
+    def get_equipment_software_by_project_id(self, project_id: int):
+        if project_id <= 0:
+            raise ValueError("ID must be a positive integer")
+        
+        return self.repo.get_equipment_software_by_project_id(project_id)
